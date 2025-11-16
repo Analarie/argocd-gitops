@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/seu-usuario/argocd-gitops.git
+    repoURL: https://github.com/Analarie/argocd-gitops.git
     targetRevision: HEAD
     path: argocd/apps
     directory:

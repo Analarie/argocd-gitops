@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/seu-usuario/portal-mamaloo-desenvolvimento.git
+    repoURL: https://github.com/Analarie/Portal-Mamaloo-desenvolvimento.git
     targetRevision: main
     path: helm/mamaloo-app
     helm:
