@@ -1,0 +1,85 @@
+---
+# PostgreSQL Cluster para ambiente DEV
+# Gerenciado pelo CloudNative PG Operator
+
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: mamaloo-db-dev
+  namespace: mamaloo-dev
+  labels:
+    app: mamaloo
+    environment: dev
+    component: database
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  instances: 1
+  
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.5
+  
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: "256MB"
+      effective_cache_size: "1GB"
+      maintenance_work_mem: "64MB"
+      checkpoint_completion_target: "0.9"
+      wal_buffers: "16MB"
+      default_statistics_target: "100"
+      random_page_cost: "1.1"
+      effective_io_concurrency: "200"
+      work_mem: "2621kB"
+      min_wal_size: "1GB"
+      max_wal_size: "4GB"
+  
+  bootstrap:
+    initdb:
+      database: mamaloo_dev
+      owner: mamaloo_dev_user
+      secret:
+        name: mamaloo-db-credentials
+  
+  storage:
+    size: 2Gi
+    storageClass: standard
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  monitoring:
+    enablePodMonitor: false
+  
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://mamaloo-backups/dev"
+      s3Credentials:
+        accessKeyId:
+          name: backup-credentials
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: backup-credentials
+          key: SECRET_ACCESS_KEY
+      wal:
+        compression: gzip
+    retentionPolicy: "7d"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mamaloo-db-credentials
+  namespace: mamaloo-dev
+  labels:
+    app: mamaloo
+    environment: dev
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+type: kubernetes.io/basic-auth
+stringData:
+  username: mamaloo_dev_user
+  password: DevPass2024!Secure
